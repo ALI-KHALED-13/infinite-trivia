@@ -1,3 +1,4 @@
+import { StyledCategory, StyledTriviaCard } from "./styled";
 
 
 
@@ -11,6 +12,14 @@ interface TriviaCardProps {
   validateAnswer: Function;//(evt: React.KeyboardEventHandler<HTMLInputElement>)=> void;
 }
 
+function decodeHTMLEntities(str) {
+
+  const txt = new DOMParser().parseFromString(str, "text/html");
+  
+  return txt.documentElement.textContent;
+  
+}
+
 const TriviaCard =({
   question,
   questionNum,
@@ -21,10 +30,11 @@ const TriviaCard =({
   validateAnswer
 }: TriviaCardProps)=> {
   return (
-    <div>
-      <span>{category} </span>
+    <StyledTriviaCard>
+      <StyledCategory>{category} </StyledCategory>
+
       <label htmlFor={"question " + questionNum}>
-        {question}
+        {decodeHTMLEntities(question)}
       </label>
       <input
         id={"question " + questionNum}
@@ -34,7 +44,7 @@ const TriviaCard =({
         disabled={disabled}
         onKeyDown={(ev)=> !disabled && ev.key == "Enter" && validateAnswer()}
       />
-    </div>
+    </StyledTriviaCard>
   );
 }
 

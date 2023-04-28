@@ -4,23 +4,60 @@ import Button from "./components/Button";
 
 
 function App() {
+  const [isFetching, setIsFetching] = useState(false);
+  const [sessionToken, setSessionToken] = useState("");
+  const [fetchError, setFetchError] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [activeQuestionNum, setActiveQuestionNum] = useState(0);
   const [userInput, setUserInput] = useState("");
   const [userAnswers, setUswerAnswers] = useState([]);
   const [showNextButton, setShowNextButton] = useState(false);
+  
+  useEffect(()=> {
+    const getSessiontoken = async()=> {
+      setIsFetching(true);
+      try {
+        const response = await fetch(`https://opentdb.com/api_token.php?command=request`);
+        const jsonResp = await response.json();
+
+        if (jsonResp.response_code === 0){
+          setSessionToken(jsonResp.token);
+        } else {
+          throw new Error("some error happened, try refreshing the page")
+        }
+      } catch (err){
+        setFetchError(err);
+      } finally {
+        setIsFetching(false);
+      }
+    }
+    getSessiontoken()
+  }, [])
 
   useEffect(()=> {
     const fetchQuestions = async()=> {
-      const response = await fetch(`https://opentdb.com/api.php?amount=${activeQuestionNum + 1}&difficulty=easy`);
+      setIsFetching(true);
+      try {
+        const response = await fetch(`https://opentdb.com/api.php?amount=${activeQuestionNum + 1}&difficulty=easy&token=${sessionToken}`);
+        const jsonResp = await response.json();
 
-      const questions = await response.json();
-      if (response.ok){
-        setQuestions(questions.results);
+        if (jsonResp.response_code === 0){
+          setQuestions(jsonResp.results);
+        } else {
+          throw new Error("some error happened, try refreshing the page")
+        }
+      } catch (err){
+        setFetchError(err);
+      } finally {
+        setIsFetching(false);
       }
+      
     }
-    fetchQuestions();
-  }, [activeQuestionNum])
+    if (sessionToken){
+      fetchQuestions();
+    }
+    
+  }, [activeQuestionNum, sessionToken])
 
 
   const activeQuestion = questions[activeQuestionNum];
@@ -41,35 +78,40 @@ function App() {
   return (
     <div>
       <h2>welcome to this fun Trivia Game</h2>
-      {activeQuestion && (
-        <TriviaCard
-          question={activeQuestion.question}
-          category={activeQuestion.category}
-          value={userInput}
-          disabled={!!userAnswers[activeQuestionNum]}
-          onChange={(ev)=> setUserInput(ev.target.value)}
-          questionNum={activeQuestionNum + 1}
-          validateAnswer={validateAnswer}
-        />
+      {isFetching? <div>Loading...</div>: 
+        fetchError? <div>{fetchError.message}</div>:
+        activeQuestion && (
+        <>
+          <TriviaCard
+            question={activeQuestion.question}
+            category={activeQuestion.category}
+            value={userInput}
+            disabled={!!userAnswers[activeQuestionNum]}
+            onChange={(ev)=> setUserInput(ev.target.value)}
+            questionNum={activeQuestionNum + 1}
+            validateAnswer={validateAnswer}
+          />
+          <Button
+            onClick={validateAnswer}
+            disabled={!!userAnswers[activeQuestionNum]}
+          >
+            Check
+          </Button>
+          {showNextButton && (
+            <Button 
+              onClick={()=> {
+                setActiveQuestionNum(activeQuestionNum + 1);
+                setUserInput("");
+                setShowNextButton(false);
+              }}
+              variant="secondary"
+            >
+              Next
+            </Button>
+          )}
+        </>
       )}
-      <Button
-        onClick={validateAnswer}
-        disabled={!!userAnswers[activeQuestionNum]}
-      >
-        Check
-      </Button>
-      {showNextButton && (
-        <Button 
-          onClick={()=> {
-            setActiveQuestionNum(activeQuestionNum + 1);
-            setUserInput("");
-            setShowNextButton(false);
-          }}
-          variant="secondary"
-        >
-          Next
-        </Button>
-      )}
+      
       
     </div>
   )
