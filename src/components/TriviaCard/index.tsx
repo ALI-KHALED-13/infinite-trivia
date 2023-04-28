@@ -1,4 +1,4 @@
-import { StyledCategory, StyledTriviaCard } from "./styled";
+import { StyledCategory, StyledTriviaCard, StyledUserInput } from "./styled";
 
 
 
@@ -36,7 +36,7 @@ const TriviaCard =({
       <label htmlFor={"question " + questionNum}>
         {decodeHTMLEntities(question)}
       </label>
-      <input
+      <StyledUserInput
         id={"question " + questionNum}
         value={value}
         onChange={onChange}
