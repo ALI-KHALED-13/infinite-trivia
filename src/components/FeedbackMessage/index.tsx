@@ -1,3 +1,4 @@
+import { StyledMessage } from "./styled";
 
 
 
@@ -6,7 +7,12 @@ const FeedbackMessage =({correctAnswer, userAnswer})=>{
   const isUserCorrect = userAnswer.trim().toLowerCase() === correctAnswer.toLowerCase();
 
   return (
-    <h2>{isUserCorrect? "correct! well done": `wrong :(, the correct answer is: ${correctAnswer}`}</h2>
+    <StyledMessage isCorrect={isUserCorrect}>
+      { isUserCorrect?
+        "correct! well done":
+        `wrong!, the correct answer is: ${correctAnswer}`
+      }
+    </StyledMessage>
   );
 }
 
