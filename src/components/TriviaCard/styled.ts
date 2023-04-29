@@ -17,7 +17,7 @@ export const StyledTriviaCard = styled.div`
 export const StyledCategory = styled.span`
   position: absolute;
   z-index: 4;
-  padding: 2px;
+  padding: 2px 4px;
   top: -10px;
   left: 5px;
   border: 1px solid gray;

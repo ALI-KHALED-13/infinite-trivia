@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react"
 import TriviaCard from "./components/TriviaCard";
 import Button from "./components/Button";
+import FeedbackMessage from "./components/FeedbackMessage";
 
 
 function App() {
   const [isFetching, setIsFetching] = useState(false);
-  const [sessionToken, setSessionToken] = useState("");
   const [fetchError, setFetchError] = useState(null);
+  const [sessionToken, setSessionToken] = useState("");
   const [questions, setQuestions] = useState([]);
   const [activeQuestionNum, setActiveQuestionNum] = useState(0);
   const [userInput, setUserInput] = useState("");
-  const [userAnswers, setUswerAnswers] = useState([]);
   const [showNextButton, setShowNextButton] = useState(false);
   
   useEffect(()=> {
@@ -38,11 +38,11 @@ function App() {
     const fetchQuestions = async()=> {
       setIsFetching(true);
       try {
-        const response = await fetch(`https://opentdb.com/api.php?amount=${activeQuestionNum + 1}&difficulty=easy&token=${sessionToken}`);
+        const response = await fetch(`https://opentdb.com/api.php?amount=1&difficulty=easy&token=${sessionToken}`);
         const jsonResp = await response.json();
 
         if (jsonResp.response_code === 0){
-          setQuestions(jsonResp.results);
+          setQuestions(questions.concat(jsonResp.results));
         } else {
           throw new Error("some error happened, try refreshing the page")
         }
@@ -50,10 +50,9 @@ function App() {
         setFetchError(err);
       } finally {
         setIsFetching(false);
-      }
-      
+      }  
     }
-    if (sessionToken){
+    if (sessionToken.length && questions[activeQuestionNum] == undefined){
       fetchQuestions();
     }
     
@@ -62,15 +61,13 @@ function App() {
 
   const activeQuestion = questions[activeQuestionNum];
 
-  const validateAnswer =()=> {
-    const isUserCorrect = userInput.trim().toLowerCase() === activeQuestion.correct_answer.toLowerCase();
-
-    alert(`You answer is ${isUserCorrect? "correct": "wrong"}`);
-
-    if (!isUserCorrect){
-      alert("correct answer is " + activeQuestion.correct_answer)
-    }
-    setUswerAnswers(userAnswers.concat(userInput));
+  const recordAnswer =()=> {
+    setQuestions(questions.map((q, idx)=> {
+      if (idx=== activeQuestionNum){
+        q.userAnswer = userInput;
+      }
+      return q;
+    }))
     
     setShowNextButton(true);
   }
@@ -85,15 +82,21 @@ function App() {
           <TriviaCard
             question={activeQuestion.question}
             category={activeQuestion.category}
-            value={userInput}
-            disabled={!!userAnswers[activeQuestionNum]}
+            value={activeQuestion.userAnswer || userInput}
+            disabled={"userAnswer" in activeQuestion}
             onChange={(ev)=> setUserInput(ev.target.value)}
             questionNum={activeQuestionNum + 1}
-            validateAnswer={validateAnswer}
+            recordAnswer={recordAnswer}
           />
+          {showNextButton && (
+            <FeedbackMessage
+              userAnswer={activeQuestion.userAnswer}
+              correctAnswer={activeQuestion.correct_answer}
+            />
+          )}
           <Button
-            onClick={validateAnswer}
-            disabled={!!userAnswers[activeQuestionNum]}
+            onClick={recordAnswer}
+            disabled={"userAnswer" in activeQuestion}
           >
             Check
           </Button>

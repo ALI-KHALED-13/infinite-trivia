@@ -9,7 +9,7 @@ interface TriviaCardProps {
   value: string;
   disabled?: boolean;
   onChange: (evt: React.ChangeEvent<HTMLInputElement>) => void;
-  validateAnswer: Function;//(evt: React.KeyboardEventHandler<HTMLInputElement>)=> void;
+  recordAnswer: Function;//(evt: React.KeyboardEventHandler<HTMLInputElement>)=> void;
 }
 
 function decodeHTMLEntities(str) {
@@ -27,7 +27,7 @@ const TriviaCard =({
   value,
   disabled,
   onChange,
-  validateAnswer
+  recordAnswer
 }: TriviaCardProps)=> {
   return (
     <StyledTriviaCard>
@@ -42,7 +42,7 @@ const TriviaCard =({
         onChange={onChange}
         autoFocus={true}
         disabled={disabled}
-        onKeyDown={(ev)=> !disabled && ev.key == "Enter" && validateAnswer()}
+        onKeyDown={(ev)=> !disabled && ev.key == "Enter" && recordAnswer()}
       />
     </StyledTriviaCard>
   );
