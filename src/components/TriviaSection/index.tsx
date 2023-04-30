@@ -67,8 +67,9 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
           id={"question " + activeQuestionNum}
           value={activeQuestion.userAnswer || userInput}
           onChange={(ev)=> setUserInput(ev.target.value)}
-          autoFocus={true}
           disabled={isAnswerSubmitted}
+          // next 2 are added so the player can play the trivia using only the keyboard, Enter after adding an answer to check, tabs to navigate to prev and next buttons 
+          autoFocus={true}
           onKeyDown={(ev)=> !(isAnswerSubmitted) && ev.key == "Enter" && recordAnswer()}
         />
         

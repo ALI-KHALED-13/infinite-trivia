@@ -6,7 +6,7 @@ import Loader from "./components/Loader";
 function App() {
   const [isFetching, setIsFetching] = useState(false);
   const [fetchError, setFetchError] = useState<IFetchError | null>(null);
-  const [sessionToken, setSessionToken] = useState("");
+  const [sessionToken, setSessionToken] = useState(""); // to avoid questions repetition
   
   useEffect(()=> {
     const getSessiontoken = async()=> {
