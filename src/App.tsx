@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
-import TriviaCard from "./components/TriviaCard";
+import TriviaSection from "./components/TriviaSection";
 import axios from "axios";
+import Loader from "./components/Loader";
 
 function App() {
   const [isFetching, setIsFetching] = useState(false);
@@ -26,12 +27,13 @@ function App() {
   
   return (
     <div style={{textAlign: "center", marginTop: "5rem"}}>
-      <h1 style={{color: "orange"}}>Trivia Game</h1>
-      {isFetching? <div>Loading...</div>: 
+      <h1 style={{color: "orange"}}>Infinite Trivia</h1>
+      {isFetching? <Loader text="initiating a session..."/>: 
         fetchError? <div>{fetchError.message}</div>:(
-          <TriviaCard sessionToken={sessionToken} />
-      )}  
+          <TriviaSection sessionToken={sessionToken} />
+      )} 
     </div>
+    
   )
 }
 

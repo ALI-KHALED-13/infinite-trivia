@@ -1,20 +1,25 @@
 import { useEffect, useState } from "react";
-import { StyledCategory, StyledInteractionArea, StyledTriviaCard, StyledTriviaWrapper, StyledUserInput } from "./styled";
+import axios from "axios";
 import FeedbackMessage from "../FeedbackMessage";
 import Button from "../Button";
-import axios from "axios";
+import {
+  StyledCategory,
+  StyledInteractionArea,
+  StyledTriviaCard,
+  StyledTriviaSection,
+  StyledUserInput
+} from "./styled";
 import { decodeHTMLEntities } from "./utils";
-
+import Loader from "../Loader";
 
 interface TriviaCardProps {sessionToken: string;}
 
 
-const TriviaCard =({sessionToken}: TriviaCardProps)=> {
+const TriviaSection =({sessionToken}: TriviaCardProps)=> {
 
   const [isFetching, setIsFetching] = useState(false);
   const [fetchError, setFetchError] = useState<IFetchError | null>(null);
   const [questions, setQuestions] = useState<IQuestion[]>([]);
-  const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [activeQuestionNum, setActiveQuestionNum] = useState(0);
 
@@ -39,22 +44,20 @@ const TriviaCard =({sessionToken}: TriviaCardProps)=> {
 
   const recordAnswer =()=> {
     setQuestions(questions.map((q, idx: number)=> {
-      if (idx=== activeQuestionNum){
-        q.userAnswer = userInput;
-      }
-      return q;
+        return idx === activeQuestionNum ? {...q, userAnswer: userInput} : q;
     }))
     setUserInput("");
-    setIsAnswerSubmitted(true);
   }
 
   const activeQuestion = questions[activeQuestionNum];
-
+  const isAnswerSubmitted = activeQuestion && "userAnswer" in activeQuestion;
   
-
-  return isFetching? <div>loading...</div>: fetchError? <div>{fetchError.message}</div>: activeQuestion && (
-    <StyledTriviaWrapper>
+  return isFetching? <Loader />:
+    fetchError? <div>{fetchError.message}</div>: 
+    activeQuestion && (
+    <StyledTriviaSection>
       <StyledTriviaCard>
+
         <StyledCategory>{activeQuestion.category} </StyledCategory>
 
         <label htmlFor={"question " + activeQuestionNum}>
@@ -65,25 +68,22 @@ const TriviaCard =({sessionToken}: TriviaCardProps)=> {
           value={activeQuestion.userAnswer || userInput}
           onChange={(ev)=> setUserInput(ev.target.value)}
           autoFocus={true}
-          disabled={"userAnswer" in activeQuestion}
-          onKeyDown={(ev)=> !("userAnswer" in activeQuestion) && ev.key == "Enter" && recordAnswer()}
+          disabled={isAnswerSubmitted}
+          onKeyDown={(ev)=> !(isAnswerSubmitted) && ev.key == "Enter" && recordAnswer()}
         />
         
       </StyledTriviaCard>
 
       <StyledInteractionArea>
-        
-        {(isAnswerSubmitted || ("userAnswer" in activeQuestion)) && (
+
+        {isAnswerSubmitted  && (
           <>
             <FeedbackMessage
               userAnswer={activeQuestion.userAnswer as string}
               correctAnswer={activeQuestion.correct_answer}
             />
             <Button 
-              onClick={()=> {
-                setActiveQuestionNum(activeQuestionNum + 1);
-                setIsAnswerSubmitted(false);
-              }}
+              onClick={()=> setActiveQuestionNum(activeQuestionNum + 1)}
               variant="secondary"
             >
               Next
@@ -93,23 +93,21 @@ const TriviaCard =({sessionToken}: TriviaCardProps)=> {
         
         <Button
           onClick={recordAnswer}
-          disabled={"userAnswer" in activeQuestion}
+          disabled={isAnswerSubmitted}
         >
           Check
         </Button>
         {questions[activeQuestionNum - 1] && (
           <Button 
-            onClick={()=> {
-              setActiveQuestionNum(activeQuestionNum - 1);
-            }}
+            onClick={()=> setActiveQuestionNum(activeQuestionNum - 1)}
             variant="secondary"
           >
             prev
           </Button>
         )}
       </StyledInteractionArea>
-    </StyledTriviaWrapper>
+    </StyledTriviaSection>
   );
 }
 
-export default TriviaCard;
+export default TriviaSection;

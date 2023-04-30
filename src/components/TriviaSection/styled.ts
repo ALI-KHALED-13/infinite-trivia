@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { mediaQuery } from "../../utils/mediaQuery";
 
 
-export const StyledTriviaWrapper = styled.div`
+export const StyledTriviaSection = styled.section`
   max-width: 90rem;
   margin: 5rem auto;
   padding: 2rem;
@@ -12,7 +12,7 @@ export const StyledTriviaWrapper = styled.div`
 
   ${mediaQuery("md")}{
     flex-direction: row; 
-    align-items: center;
+    align-items: flex-end;
   }
 `;
 
@@ -27,7 +27,7 @@ export const StyledInteractionArea = styled.div`
 
 export const StyledTriviaCard = styled.div`
   padding: 2rem;
-  max-width: 50rem;
+  //max-width: 50rem;
   border: 1px solid gray;
   position: relative;
   border-radius: 1rem;

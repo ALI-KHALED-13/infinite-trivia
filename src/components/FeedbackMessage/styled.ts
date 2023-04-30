@@ -9,5 +9,6 @@ export const StyledMessage = styled.p<StyledMessageProps>`
   font-size: 1.5rem;
   flex-shrink: 0;
   font-weight: 600;
+  letter-spacing: 1px;
   color ${({isCorrect})=> isCorrect? "green": "red"};
 `;
