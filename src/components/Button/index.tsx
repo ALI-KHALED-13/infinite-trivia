@@ -10,7 +10,7 @@ interface ButtonProps {
 
 const Button =({
   children,
-  disabled,
+  disabled = false,
   onClick,
   style,
   variant = "primary"
@@ -20,7 +20,7 @@ const Button =({
     "primary": StyledPrimaryButton,
     "secondary": StyledSecondaryButton
   }
-  const ButtonVariant = buttonVariants[variant as keyof object] ;
+  const ButtonVariant = buttonVariants[variant as keyof (typeof buttonVariants)] ;
 
   return (
     <ButtonVariant

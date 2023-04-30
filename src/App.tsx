@@ -1,26 +1,21 @@
 import { useEffect, useState } from "react"
 import TriviaCard from "./components/TriviaCard";
+import axios from "axios";
 
 function App() {
   const [isFetching, setIsFetching] = useState(false);
-  const [fetchError, setFetchError] = useState(null);
+  const [fetchError, setFetchError] = useState<IFetchError | null>(null);
   const [sessionToken, setSessionToken] = useState("");
-  
   
   useEffect(()=> {
     const getSessiontoken = async()=> {
       setIsFetching(true);
       try {
-        const response = await fetch(`https://opentdb.com/api_token.php?command=request`);
-        const jsonResp = await response.json();
+        const response = await axios.get("https://opentdb.com/api_token.php?command=request");
+        setSessionToken(response.data.token);
 
-        if (jsonResp.response_code === 0){
-          setSessionToken(jsonResp.token);
-        } else {
-          throw new Error("some error happened, try refreshing the page")
-        }
-      } catch (err){
-        setFetchError(err);
+      } catch (error: any){
+        setFetchError(error.response?.data || error);
       } finally {
         setIsFetching(false);
       }

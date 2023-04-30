@@ -2,24 +2,18 @@ import { useEffect, useState } from "react";
 import { StyledCategory, StyledInteractionArea, StyledTriviaCard, StyledTriviaWrapper, StyledUserInput } from "./styled";
 import FeedbackMessage from "../FeedbackMessage";
 import Button from "../Button";
-
+import axios from "axios";
+import { decodeHTMLEntities } from "./utils";
 
 
 interface TriviaCardProps {sessionToken: string;}
 
-function decodeHTMLEntities(str) {
-
-  const txt = new DOMParser().parseFromString(str, "text/html");
-  
-  return txt.documentElement.textContent;
-  
-}
 
 const TriviaCard =({sessionToken}: TriviaCardProps)=> {
 
   const [isFetching, setIsFetching] = useState(false);
-  const [fetchError, setFetchError] = useState(null);
-  const [questions, setQuestions] = useState([]);
+  const [fetchError, setFetchError] = useState<IFetchError | null>(null);
+  const [questions, setQuestions] = useState<IQuestion[]>([]);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [activeQuestionNum, setActiveQuestionNum] = useState(0);
@@ -28,16 +22,11 @@ const TriviaCard =({sessionToken}: TriviaCardProps)=> {
     const fetchQuestions = async()=> {
       setIsFetching(true);
       try {
-        const response = await fetch(`https://opentdb.com/api.php?amount=1&difficulty=easy&token=${sessionToken}`);
-        const jsonResp = await response.json();
+        const response = await axios.get(`https://opentdb.com/api.php?amount=1&difficulty=easy&token=${sessionToken}`);
+        setQuestions(questions.concat(response.data.results))
 
-        if (jsonResp.response_code === 0){
-          setQuestions(questions.concat(jsonResp.results));
-        } else {
-          throw new Error("some error happened, try refreshing the page")
-        }
-      } catch (err){
-        setFetchError(err);
+      } catch (error: any){
+        setFetchError(error.response?.data || error);
       } finally {
         setIsFetching(false);
       }  
@@ -46,10 +35,10 @@ const TriviaCard =({sessionToken}: TriviaCardProps)=> {
       fetchQuestions();
     }
     
-  }, [activeQuestionNum, sessionToken]);
+  }, [activeQuestionNum, sessionToken, questions]);
 
   const recordAnswer =()=> {
-    setQuestions(questions.map((q, idx)=> {
+    setQuestions(questions.map((q, idx: number)=> {
       if (idx=== activeQuestionNum){
         q.userAnswer = userInput;
       }
@@ -87,7 +76,7 @@ const TriviaCard =({sessionToken}: TriviaCardProps)=> {
         {(isAnswerSubmitted || ("userAnswer" in activeQuestion)) && (
           <>
             <FeedbackMessage
-              userAnswer={activeQuestion.userAnswer}
+              userAnswer={activeQuestion.userAnswer as string}
               correctAnswer={activeQuestion.correct_answer}
             />
             <Button 

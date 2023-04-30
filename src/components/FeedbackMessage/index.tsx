@@ -1,8 +1,11 @@
 import { StyledMessage } from "./styled";
 
+interface FeedbackMessagesProps {
+  correctAnswer: string;
+  userAnswer: string;
+}
 
-
-const FeedbackMessage =({correctAnswer, userAnswer})=>{
+const FeedbackMessage =({correctAnswer, userAnswer}: FeedbackMessagesProps)=>{
 
   const isUserCorrect = userAnswer.trim().toLowerCase() === correctAnswer.toLowerCase();
 
