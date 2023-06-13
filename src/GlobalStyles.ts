@@ -38,6 +38,10 @@ const GlobalStyles = createGlobalStyle`
     background-color: #242424;
   }
 
+  h1 {
+    color: orange;
+    font-size: 2.4rem;
+  }
 `;
 
 export default GlobalStyles;

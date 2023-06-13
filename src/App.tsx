@@ -27,13 +27,14 @@ function App() {
   
   return (
     <div style={{textAlign: "center", marginTop: "5rem"}}>
-      <h1 style={{color: "orange"}}>Infinite Trivia</h1>
+
+      <h1>Infinite Trivia</h1>
+
       {isFetching? <Loader text="initiating a session..."/>: 
         fetchError? <div>{fetchError.message}</div>:(
           <TriviaSection sessionToken={sessionToken} />
       )}
     </div>
-    
   )
 }
 
