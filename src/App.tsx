@@ -31,7 +31,7 @@ function App() {
       {isFetching? <Loader text="initiating a session..."/>: 
         fetchError? <div>{fetchError.message}</div>:(
           <TriviaSection sessionToken={sessionToken} />
-      )} 
+      )}
     </div>
     
   )

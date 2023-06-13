@@ -16,15 +16,6 @@ export const StyledTriviaSection = styled.section`
   }
 `;
 
-export const StyledInteractionArea = styled.div`
-  padding: 1rem;
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  gap: 2rem;
-  min-width: 45%;
-`;
-
 export const StyledTriviaCard = styled.div`
   padding: 2rem;
   //max-width: 50rem;
@@ -49,15 +40,18 @@ export const StyledCategory = styled.span`
   border-radius: 0.5rem;
 `;
 
-export const StyledUserInput = styled.input`
-  width: 95%;
-  border: none;
-  color: gold;
-  padding: 0.5rem;
-  margin: 1rem;
-  font-size: 2rem;
-  text-align: center;
-  &:focus {
-    outline: none;
+export const StyledOptionsList = styled.ul`
+  list-style-type: none;
+  & > li {
+    margin: 1rem 0;
   }
+`;
+
+export const StyledInteractionArea = styled.div`
+  padding: 1rem;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 2rem;
+  min-width: 45%;
 `;

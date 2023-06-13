@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import FeedbackMessage from "../FeedbackMessage";
 import Button from "../Button";
 import {
   StyledCategory,
   StyledInteractionArea,
+  StyledOptionsList,
   StyledTriviaCard,
   StyledTriviaSection,
-  StyledUserInput
 } from "./styled";
-import { decodeHTMLEntities } from "./utils";
+import { appendQuestionOptions, decodeHTMLEntities } from "./utils";
 import Loader from "../Loader";
+import RadioInput from "../RadioInput";
 
 interface TriviaCardProps {sessionToken: string;}
 
@@ -20,7 +20,7 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
   const [isFetching, setIsFetching] = useState(false);
   const [fetchError, setFetchError] = useState<IFetchError | null>(null);
   const [questions, setQuestions] = useState<IQuestion[]>([]);
-  const [userInput, setUserInput] = useState("");
+  const [userChoice, setUserChoice] = useState<IOption | undefined>(undefined);
   const [activeQuestionNum, setActiveQuestionNum] = useState(0);
 
   useEffect(()=> {
@@ -28,8 +28,12 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
       setIsFetching(true);
       try {
         const response = await axios.get(`https://opentdb.com/api.php?amount=1&difficulty=easy&token=${sessionToken}`);
-        setQuestions(questions.concat(response.data.results))
+        
+        const fetchedQuestion = response.data.results[0];
 
+        appendQuestionOptions(fetchedQuestion)
+
+        setQuestions(questions.concat(fetchedQuestion))
       } catch (error: any){
         setFetchError(error.response?.data || error);
       } finally {
@@ -44,9 +48,9 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
 
   const recordAnswer =()=> {
     setQuestions(questions.map((q, idx: number)=> {
-        return idx === activeQuestionNum ? {...q, userAnswer: userInput} : q;
+        return idx === activeQuestionNum ? {...q, userAnswer: userChoice} : q;
     }))
-    setUserInput("");
+    setUserChoice(undefined)
   }
 
   const activeQuestion = questions[activeQuestionNum];
@@ -60,41 +64,39 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
 
         <StyledCategory>{activeQuestion.category} </StyledCategory>
 
-        <label htmlFor={"question " + activeQuestionNum}>
+        <label>
           {decodeHTMLEntities(activeQuestion.question)}
         </label>
-        <StyledUserInput
-          id={"question " + activeQuestionNum}
-          value={activeQuestion.userAnswer || userInput}
-          onChange={(ev)=> setUserInput(ev.target.value)}
-          disabled={isAnswerSubmitted}
-          // next 2 are added so the player can play the trivia using only the keyboard, Enter after adding an answer to check, tabs to navigate to prev and next buttons 
-          autoFocus={true}
-          onKeyDown={(ev)=> !(isAnswerSubmitted) && ev.key == "Enter" && recordAnswer()}
-        />
+        
+        <StyledOptionsList>
+          {activeQuestion.options?.map(op=> (
+            <RadioInput
+              key={'question no.' + activeQuestionNum + " " + op.value}
+              value={activeQuestion.userAnswer || userChoice}
+              option={op}
+              disabled={isAnswerSubmitted}
+              showMarking={isAnswerSubmitted}
+              onClick={(clickedOp)=> setUserChoice(clickedOp)}
+            />
+          ))}
+        </StyledOptionsList>
         
       </StyledTriviaCard>
 
       <StyledInteractionArea>
 
         {isAnswerSubmitted  && (
-          <>
-            <FeedbackMessage
-              userAnswer={activeQuestion.userAnswer as string}
-              correctAnswer={activeQuestion.correct_answer}
-            />
-            <Button 
-              onClick={()=> setActiveQuestionNum(activeQuestionNum + 1)}
-              variant="secondary"
-            >
-              Next
-            </Button>
-          </>
+          <Button 
+            onClick={()=> setActiveQuestionNum(activeQuestionNum + 1)}
+            variant="secondary"
+          >
+            Next
+          </Button>
         )}
         
         <Button
           onClick={recordAnswer}
-          disabled={isAnswerSubmitted}
+          disabled={isAnswerSubmitted || !userChoice}
         >
           Check
         </Button>
