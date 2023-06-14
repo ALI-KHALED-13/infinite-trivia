@@ -85,12 +85,12 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
 
       <StyledInteractionArea>
 
-        {isAnswerSubmitted  && (
+        {questions[activeQuestionNum - 1] && (
           <Button 
-            onClick={()=> setActiveQuestionNum(activeQuestionNum + 1)}
+            onClick={()=> setActiveQuestionNum(activeQuestionNum - 1)}
             variant="secondary"
           >
-            Next
+            prev
           </Button>
         )}
         
@@ -100,14 +100,16 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
         >
           Check
         </Button>
-        {questions[activeQuestionNum - 1] && (
+
+        {isAnswerSubmitted  && (
           <Button 
-            onClick={()=> setActiveQuestionNum(activeQuestionNum - 1)}
+            onClick={()=> setActiveQuestionNum(activeQuestionNum + 1)}
             variant="secondary"
           >
-            prev
+            Next
           </Button>
         )}
+        
       </StyledInteractionArea>
     </StyledTriviaSection>
   );
