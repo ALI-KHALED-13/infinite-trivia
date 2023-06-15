@@ -146,10 +146,12 @@ Error generating stack: `+i.message+`
   }
 `,jy=Ue.div`
   min-height: 35vh;
+  margin-top: 5rem;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
+  margin-top: 
 `,Iy=Ue.div`
   position: absolute;
   width: 20rem;
