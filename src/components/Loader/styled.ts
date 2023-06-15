@@ -21,10 +21,12 @@ const loopAnimation  = keyframes`
 
 export const StyledLoaderOverlay = styled.div`
   min-height: 35vh;
+  margin-top: 5rem;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
+  margin-top: 
 `;
 
 export const StyledLoader = styled.div`
