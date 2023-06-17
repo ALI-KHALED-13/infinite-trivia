@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Button from "../Button";
 import {
@@ -12,8 +12,8 @@ import { appendQuestionOptions, decodeHTMLEntities } from "./utils";
 import Loader from "../Loader";
 import RadioInput from "../RadioInput";
 
-interface TriviaCardProps {sessionToken: string;}
 
+interface TriviaCardProps {sessionToken: string;}
 
 const TriviaSection =({sessionToken}: TriviaCardProps)=> {
 
@@ -22,6 +22,8 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
   const [questions, setQuestions] = useState<IQuestion[]>([]);
   const [userChoice, setUserChoice] = useState<IOption | undefined>(undefined);
   const [activeQuestionNum, setActiveQuestionNum] = useState(0);
+  const rightSFXRef = useRef<null | HTMLAudioElement>(null);
+  const wrongSFXRef = useRef<null | HTMLAudioElement>(null);
 
   useEffect(()=> {
     const fetchQuestions = async()=> {
@@ -50,12 +52,17 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
     setQuestions(questions.map((q, idx: number)=> {
         return idx === activeQuestionNum ? {...q, userAnswer: userChoice} : q;
     }))
+    if (userChoice?.value === activeQuestion.correct_answer){
+      rightSFXRef.current?.play()
+    } else {
+      wrongSFXRef.current?.play()
+    }
     setUserChoice(undefined)
   }
 
   const activeQuestion = questions[activeQuestionNum];
   const isAnswerSubmitted = activeQuestion && "userAnswer" in activeQuestion;
-  
+  console.log({activeQuestion})
   return isFetching? <Loader />:
     fetchError? <div>{fetchError.message}</div>: 
     activeQuestion && (
@@ -64,9 +71,7 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
 
         <StyledCategory>{activeQuestion.category} </StyledCategory>
 
-        <label>
-          {decodeHTMLEntities(activeQuestion.question)}
-        </label>
+        <label> {decodeHTMLEntities(activeQuestion.question)} </label>
         
         <StyledOptionsList>
           {activeQuestion.options?.map(op=> (
@@ -84,7 +89,6 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
       </StyledTriviaCard>
 
       <StyledInteractionArea>
-
         {questions[activeQuestionNum - 1] && (
           <Button 
             onClick={()=> setActiveQuestionNum(activeQuestionNum - 1)}
@@ -94,10 +98,7 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
           </Button>
         )}
         
-        <Button
-          onClick={recordAnswer}
-          disabled={isAnswerSubmitted || !userChoice}
-        >
+        <Button onClick={recordAnswer} disabled={isAnswerSubmitted || !userChoice}>
           Check
         </Button>
 
@@ -108,9 +109,13 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
           >
             Next
           </Button>
-        )}
-        
+        )} 
       </StyledInteractionArea>
+
+      <> {/* feedbakc soundeffect area */}
+          <audio src="/rightanswer.mp3" ref={rightSFXRef}/>
+          <audio src="/wronganswer.mp3" ref={wrongSFXRef}/>
+      </>
     </StyledTriviaSection>
   );
 }
