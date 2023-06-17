@@ -11,7 +11,8 @@ import {
 import { appendQuestionOptions, decodeHTMLEntities } from "./utils";
 import Loader from "../Loader";
 import RadioInput from "../RadioInput";
-
+import rightSFX from '../../assets/rightanswer.mp3';
+import wrongSFX from '../../assets/wronganswer.mp3';
 
 interface TriviaCardProps {sessionToken: string;}
 
@@ -62,7 +63,7 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
 
   const activeQuestion = questions[activeQuestionNum];
   const isAnswerSubmitted = activeQuestion && "userAnswer" in activeQuestion;
-  console.log({activeQuestion})
+  
   return isFetching? <Loader />:
     fetchError? <div>{fetchError.message}</div>: 
     activeQuestion && (
@@ -113,8 +114,8 @@ const TriviaSection =({sessionToken}: TriviaCardProps)=> {
       </StyledInteractionArea>
 
       <> {/* feedbakc soundeffect area */}
-          <audio src="/rightanswer.mp3" ref={rightSFXRef}/>
-          <audio src="/wronganswer.mp3" ref={wrongSFXRef}/>
+          <audio src={rightSFX} ref={rightSFXRef}/>
+          <audio src={wrongSFX} ref={wrongSFXRef}/>
       </>
     </StyledTriviaSection>
   );
