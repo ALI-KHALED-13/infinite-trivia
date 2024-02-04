@@ -22,6 +22,13 @@ function App() {
       }
     }
     getSessiontoken()
+    const LeanWindow = window;
+    LeanWindow.Lean.connect({
+      app_token: "0b90de00-da33-49b7-985e-bd9c5c5cb133",
+      permissions: ["identity","accounts","transactions","balance"],
+      sandbox: true,
+      customer_id: "investors"
+    })
   }, [])
 
   
